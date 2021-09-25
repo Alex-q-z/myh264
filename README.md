@@ -29,3 +29,26 @@ You can now encode the video with
 ffmpeg -y -i path_to_video_frames/%010d.png -start_number 0 -qp 10 -pix_fmt yuv420p video.mp4
 ```
 You may use any value for the "-qp" field, which does not matter in RoI encoding.
+
+## Uniform QP Encoding (MPEG)
+If you'd like to encode the entire video with a uniform QP value of X, change the content of operation_mode_file to
+```
+0,X,
+```
+Then run with the usual ffmpeg encoding command. myh264 will ensure that in the encoded video, the QP value of every macroblock is strictly equal to X. Note that the bit-rate control module will be surpassed.
+
+## Common Problems
+
+### libavdevice not found
+You might encounter the following error when running ffmpeg commands with myh264 installed:
+```
+ffmpeg: error while loading shared libraries: libavdevice.so.59: cannot open shared object file: No such file or directory
+```
+In this case, ffmpeg is not searching for libavdevice.so.59 in the directory. First, do
+```
+find /tank/your_cnet_id -name libavdevice.so.59
+```
+Add the returned directory to LD_LIBRARY_PATH. For example, I'll do
+```
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/tank/qizheng/lib/
+```
