@@ -155,8 +155,11 @@ static int push_frame(AVFilterGraph *graph)
 {
     int ret;
 
+    LOG;
     while (1) {
+        LOG;
         ret = ff_filter_graph_run_once(graph);
+        LOG;
         if (ret == AVERROR(EAGAIN))
             break;
         if (ret < 0)
@@ -171,6 +174,7 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
     AVFrame *copy;
     int refcounted, ret;
 
+    LOG;
     if (frame && frame->channel_layout &&
         av_get_channel_layout_nb_channels(frame->channel_layout) != frame->channels) {
         av_log(ctx, AV_LOG_ERROR, "Layout indicates a different number of channels than actually present\n");
@@ -179,6 +183,7 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
 
     s->nb_failed_requests = 0;
 
+    LOG;
     if (!frame)
         return av_buffersrc_close(ctx, AV_NOPTS_VALUE, flags);
 
@@ -191,6 +196,7 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
 
         switch (ctx->outputs[0]->type) {
         case AVMEDIA_TYPE_VIDEO:
+            LOG;
             CHECK_VIDEO_PARAM_CHANGE(ctx, s, frame->width, frame->height,
                                      frame->format, frame->pts);
             break;
@@ -207,9 +213,11 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
 
     }
 
+    LOG;
     if (!(copy = av_frame_alloc()))
         return AVERROR(ENOMEM);
 
+    LOG;
     if (refcounted && !(flags & AV_BUFFERSRC_FLAG_KEEP_REF)) {
         av_frame_move_ref(copy, frame);
     } else {
@@ -220,11 +228,14 @@ int attribute_align_arg av_buffersrc_add_frame_flags(AVFilterContext *ctx, AVFra
         }
     }
 
+    LOG;
     ret = ff_filter_frame(ctx->outputs[0], copy);
     if (ret < 0)
         return ret;
 
+    LOG;
     if ((flags & AV_BUFFERSRC_FLAG_PUSH)) {
+        LOG;
         ret = push_frame(ctx->graph);
         if (ret < 0)
             return ret;

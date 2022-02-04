@@ -1,0 +1,1 @@
+config:x86:x86_64:generic:linux:gcc 7 (Ubuntu 7.5.0-3ubuntu1~18.04):--enable-libx264 --enable-gpl --enable-shared --disable-x86asm --prefix=/tank/kuntai/ --extra-cflags=-I/tank/kuntai/myh264/x264 --extra-ldflags=-I/tank/kuntai/myh264/x264

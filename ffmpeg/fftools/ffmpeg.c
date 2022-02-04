@@ -2176,6 +2176,7 @@ static int ifilter_has_all_input_formats(FilterGraph *fg)
 
 static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
 {
+    LOG;
     FilterGraph *fg = ifilter->graph;
     int need_reinit, ret, i;
 
@@ -2194,6 +2195,7 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
         break;
     }
 
+    LOG;
     if (!ifilter->ist->reinit_filters && fg->graph)
         need_reinit = 0;
 
@@ -2201,12 +2203,14 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
         (ifilter->hw_frames_ctx && ifilter->hw_frames_ctx->data != frame->hw_frames_ctx->data))
         need_reinit = 1;
 
+    LOG;
     if (need_reinit) {
         ret = ifilter_parameters_from_frame(ifilter, frame);
         if (ret < 0)
             return ret;
     }
 
+    LOG;
     /* (re)init the graph if possible, otherwise buffer the frame and return */
     if (need_reinit || !fg->graph) {
         for (i = 0; i < fg->nb_inputs; i++) {
@@ -2239,6 +2243,7 @@ static int ifilter_send_frame(InputFilter *ifilter, AVFrame *frame)
             return ret;
         }
     }
+    LOG;
     ret = av_buffersrc_add_frame_flags(ifilter->filter, frame, AV_BUFFERSRC_FLAG_PUSH);
     if (ret < 0) {
         if (ret != AVERROR_EOF)
@@ -2281,6 +2286,7 @@ static int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacke
 
     *got_frame = 0;
 
+    LOG;
     if (pkt) {
         ret = avcodec_send_packet(avctx, pkt);
         // In particular, we don't expect AVERROR(EAGAIN), because we read all
@@ -2288,12 +2294,14 @@ static int decode(AVCodecContext *avctx, AVFrame *frame, int *got_frame, AVPacke
         if (ret < 0 && ret != AVERROR_EOF)
             return ret;
     }
+    LOG;
 
     ret = avcodec_receive_frame(avctx, frame);
     if (ret < 0 && ret != AVERROR(EAGAIN))
         return ret;
     if (ret >= 0)
         *got_frame = 1;
+    LOG;
 
     return 0;
 }
@@ -2303,16 +2311,21 @@ static int send_frame_to_filters(InputStream *ist, AVFrame *decoded_frame)
     int i, ret;
     AVFrame *f;
 
+    LOG;
     av_assert1(ist->nb_filters > 0); /* ensure ret is initialized */
     for (i = 0; i < ist->nb_filters; i++) {
         if (i < ist->nb_filters - 1) {
             f = ist->filter_frame;
+            LOG;
             ret = av_frame_ref(f, decoded_frame);
+            LOG;
             if (ret < 0)
                 break;
         } else
             f = decoded_frame;
+        LOG;
         ret = ifilter_send_frame(ist->filters[i], f);
+        LOG;
         if (ret == AVERROR_EOF)
             ret = 0; /* ignore */
         if (ret < 0) {
@@ -2400,17 +2413,20 @@ static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_
     if (!eof && pkt && pkt->size == 0)
         return 0;
 
+    LOG;
     if (!ist->decoded_frame && !(ist->decoded_frame = av_frame_alloc()))
         return AVERROR(ENOMEM);
     if (!ist->filter_frame && !(ist->filter_frame = av_frame_alloc()))
         return AVERROR(ENOMEM);
 
+    LOG;
     decoded_frame = ist->decoded_frame;
     if (ist->dts != AV_NOPTS_VALUE)
         dts = av_rescale_q(ist->dts, AV_TIME_BASE_Q, ist->st->time_base);
     if (pkt) {
         pkt->dts = dts; // ffmpeg.c probably shouldn't do this
     }
+    LOG;
 
     // The old code used to set dts on the drain packet, which does not work
     // with the new API anymore.
@@ -2423,7 +2439,9 @@ static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_
     }
 
     update_benchmark(NULL);
+    LOG;
     ret = decode(ist->dec_ctx, decoded_frame, got_output, pkt);
+    LOG;
     update_benchmark("decode_video %d.%d", ist->file_index, ist->st->index);
 
     if (ret < 0)
@@ -2444,6 +2462,7 @@ static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_
                    ist->st->codecpar->video_delay);
     }
 
+    LOG;
     if (ret != AVERROR_EOF)
         check_decode_result(ist, got_output, ret);
 
@@ -2511,7 +2530,9 @@ static int decode_video(InputStream *ist, AVPacket *pkt, int *got_output, int64_
     if (ist->st->sample_aspect_ratio.num)
         decoded_frame->sample_aspect_ratio = ist->st->sample_aspect_ratio;
 
+    LOG;
     err = send_frame_to_filters(ist, decoded_frame);
+    LOG;
 
 fail:
     av_frame_unref(ist->filter_frame);
@@ -2626,6 +2647,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
     if (!ist->pkt && !(ist->pkt = av_packet_alloc()))
         return AVERROR(ENOMEM);
     avpkt = ist->pkt;
+    LOG;
 
     if (!ist->saw_first_ts) {
         ist->first_dts =
@@ -2638,6 +2660,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
         }
         ist->saw_first_ts = 1;
     }
+    LOG;
 
     if (ist->next_dts == AV_NOPTS_VALUE)
         ist->next_dts = ist->dts;
@@ -2650,15 +2673,18 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
         if (ret < 0)
             return ret;
     }
+    LOG;
 
     if (pkt && pkt->dts != AV_NOPTS_VALUE) {
         ist->next_dts = ist->dts = av_rescale_q(pkt->dts, ist->st->time_base, AV_TIME_BASE_Q);
         if (ist->dec_ctx->codec_type != AVMEDIA_TYPE_VIDEO || !ist->decoding_needed)
             ist->next_pts = ist->pts = ist->dts;
     }
+    LOG;
 
     // while we have more to decode or while the decoder did output something on EOF
     while (ist->decoding_needed) {
+        LOG;
         int64_t duration_dts = 0;
         int64_t duration_pts = 0;
         int got_output = 0;
@@ -2674,8 +2700,10 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
             av_packet_unref(avpkt);
             break;
         case AVMEDIA_TYPE_VIDEO:
+            LOG;
             ret = decode_video    (ist, repeating ? NULL : avpkt, &got_output, &duration_pts, !pkt,
                                    &decode_failed);
+            LOG;
             if (!repeating || !pkt || got_output) {
                 if (pkt && pkt->duration) {
                     duration_dts = av_rescale_q(pkt->duration, ist->st->time_base, AV_TIME_BASE_Q);
@@ -2750,6 +2778,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
 
         repeating = 1;
     }
+    LOG;
 
     /* after flushing, send an EOF on all the filter inputs attached to the stream */
     /* except when looping we need to flush but not to send an EOF */
@@ -2760,6 +2789,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
             exit_program(1);
         }
     }
+    LOG;
 
     /* handle stream copy */
     if (!ist->decoding_needed && pkt) {
@@ -2793,6 +2823,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
         ist->pts = ist->dts;
         ist->next_pts = ist->next_dts;
     }
+    LOG;
     for (i = 0; i < nb_output_streams; i++) {
         OutputStream *ost = output_streams[i];
 
@@ -2803,6 +2834,7 @@ static int process_input_packet(InputStream *ist, const AVPacket *pkt, int no_eo
 
         do_streamcopy(ist, ost, pkt);
     }
+    LOG;
 
     return !eof_reached;
 }

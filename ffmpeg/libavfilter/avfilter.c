@@ -953,23 +953,30 @@ static int ff_filter_frame_framed(AVFilterLink *link, AVFrame *frame)
     AVFilterPad *dst = link->dstpad;
     int ret;
 
+    printf("flag: %s\n", dst->filter_frame);
     if (!(filter_frame = dst->filter_frame)) {
+        LOG;
         filter_frame = default_filter_frame;
     }
 
+    LOG;
     if (dst->needs_writable) {
         ret = ff_inlink_make_frame_writable(link, &frame);
         if (ret < 0)
             goto fail;
     }
+    LOG;
     ff_inlink_process_commands(link, frame);
+    LOG;
     dstctx->is_disabled = !ff_inlink_evaluate_timeline_at_frame(link, frame);
-
+    LOG;
     if (dstctx->is_disabled &&
         (dstctx->filter->flags & AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC)) {
+        LOG;
         filter_frame = default_filter_frame;
     }
 
+    LOG;
     ret = filter_frame(link, frame);
     link->frame_count_out++;
     return ret;
@@ -1103,6 +1110,7 @@ static int ff_filter_frame_to_filter(AVFilterLink *link)
     AVFilterContext *dst = link->dst;
     int ret;
 
+    LOG;
     av_assert1(ff_framequeue_queued_frames(&link->fifo));
     ret = link->min_samples ?
           ff_inlink_consume_samples(link, link->min_samples, link->max_samples, &frame) :
@@ -1113,20 +1121,26 @@ static int ff_filter_frame_to_filter(AVFilterLink *link)
         return ret;
     }
 
+    LOG;
     /* The filter will soon have received a new frame, that may allow it to
        produce one or more: unblock its outputs. */
     filter_unblock(dst);
+    LOG;
     /* AVFilterPad.filter_frame() expect frame_count_out to have the value
        before the frame; ff_filter_frame_framed() will re-increment it. */
     link->frame_count_out--;
 
+    LOG;
     ret = ff_filter_frame_framed(link, frame);
+    LOG;
 
     if (ret < 0 && ret != link->status_out) {
+        LOG;
         ff_avfilter_link_set_out_status(link, ret, AV_NOPTS_VALUE);
     } else {
         /* Run once again, to see if several frames were available, or if
            the input status has also changed, or any other reason. */
+        LOG;
         ff_filter_set_ready(dst, 300);
     }
 
@@ -1169,20 +1183,29 @@ static int ff_filter_activate_default(AVFilterContext *filter)
 {
     unsigned i;
 
+    LOG;
     for (i = 0; i < filter->nb_inputs; i++) {
+        LOG;
         if (samples_ready(filter->inputs[i], filter->inputs[i]->min_samples)) {
+            LOG;
             return ff_filter_frame_to_filter(filter->inputs[i]);
         }
     }
+    LOG;
     for (i = 0; i < filter->nb_inputs; i++) {
+        LOG;
         if (filter->inputs[i]->status_in && !filter->inputs[i]->status_out) {
+            LOG;
             av_assert1(!ff_framequeue_queued_frames(&filter->inputs[i]->fifo));
+            LOG;
             return forward_status_change(filter, filter->inputs[i]);
         }
     }
+    LOG;
     for (i = 0; i < filter->nb_outputs; i++) {
         if (filter->outputs[i]->frame_wanted_out &&
             !filter->outputs[i]->frame_blocked_in) {
+            LOG;
             return ff_request_frame_to_filter(filter->outputs[i]);
         }
     }
@@ -1330,9 +1353,12 @@ int ff_filter_activate(AVFilterContext *filter)
     av_assert1(!(filter->filter->flags & AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC &&
                  filter->filter->activate));
 
+    LOG;
     filter->ready = 0;
+    printf("flag: %d\n",filter->filter->activate);
     ret = filter->filter->activate ? filter->filter->activate(filter) :
           ff_filter_activate_default(filter);
+    LOG;
 
     if (ret == FFERROR_NOT_READY)
         ret = 0;

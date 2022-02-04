@@ -1,0 +1,14 @@
+prefix=/tank/qizheng/
+exec_prefix=${prefix}
+libdir=/tank/qizheng//lib
+includedir=/tank/qizheng//include
+
+Name: libavcodec
+Description: FFmpeg codec library
+Version: 57.107.100
+Requires: 
+Requires.private: libswresample >= 2.9.100, libavutil >= 55.78.100
+Conflicts:
+Libs: -L${libdir}  -lavcodec 
+Libs.private: -lXv -lX11 -lXext -lSDL2 -lSDL2 -lxcb -lxcb-shm -lxcb-xfixes -lxcb-shape -lsndio -lasound -lSDL2 -L/tank/qizheng//lib -lx264 -lm -ldl -llzma -lbz2 -lz -pthread -pthread
+Cflags: -I${includedir}

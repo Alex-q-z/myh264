@@ -1536,7 +1536,7 @@ x264_t *x264_encoder_open( x264_param_t *param, void *api )
     x264_validate_levels( h, 1 );
 
     h->chroma_qp_table = i_chroma_qp_table + 12 + h->pps->i_chroma_qp_index_offset;
-    x264_log(h, X264_LOG_INFO, "h->pps->i_chroma_qp_index_offset is: %d\n", h->pps->i_chroma_qp_index_offset);
+    // x264_log(h, X264_LOG_INFO, "h->pps->i_chroma_qp_index_offset is: %d\n", h->pps->i_chroma_qp_index_offset);
 
     if( x264_cqm_init( h ) < 0 )
         goto fail;
@@ -4823,9 +4823,9 @@ int     x264_encoder_encode( x264_t *h,
     h->i_threadslice_end = h->mb.i_mb_height;
 
     // Qizheng: add qp matrix file here
-    h->operation_mode_file = x264_fopen("operation_mode_file", "r");
+    h->operation_mode_file = x264_fopen("/tank/kuntai/code/operation_mode_file", "r");
     fscanf(h->operation_mode_file, "%d,", &h->operation_mode_flag);
-    h->qp_matrix_file = x264_fopen("qp_matrix_file", "r");
+    h->qp_matrix_file = x264_fopen("/tank/kuntai/code/qp_matrix_file", "r");
     // h->qp_matrix_file_test = x264_fopen("/Users/qizhengzhang/Desktop/x264/qp_matrix_file_test", "a+");
 
     if( h->i_thread_frames > 1 )

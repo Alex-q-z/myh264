@@ -1392,6 +1392,7 @@ int ff_filter_graph_run_once(AVFilterGraph *graph)
     AVFilterContext *filter;
     unsigned i;
 
+    LOG;
     av_assert0(graph->nb_filters);
     filter = graph->filters[0];
     for (i = 1; i < graph->nb_filters; i++)
@@ -1399,5 +1400,6 @@ int ff_filter_graph_run_once(AVFilterGraph *graph)
             filter = graph->filters[i];
     if (!filter->ready)
         return AVERROR(EAGAIN);
+    LOG;
     return ff_filter_activate(filter);
 }
