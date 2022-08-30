@@ -1,0 +1,56 @@
+# Project specific
+*.mp4
+ffmpeg/*
+libs/*
+
+# Checkpoints and archives
+**/.ipynb_checkpoints
+*.pth
+*.pth.*
+*.tar
+*.tar.*
+*.zip
+*.mp4
+*.avi
+*.out
+*.npy
+*.log
+
+# DCN RFCN parameters
+Deformable-ConvNets-py3/
+
+# Generated logs
+screenlog.*
+*.log
+
+# From torchvision
+build/
+dist/
+docs/build
+*.egg-info/
+
+.coverage
+
+# Python
+*/**/__pycache__
+*/__pycache__
+*/*.pyc
+*/**/*.pyc
+*/**/**/*.pyc
+*/**/*~
+*~
+
+# System
+*.so*
+*.dylib*
+*/*.so*
+*/*.dylib*
+
+# VIM
+*.swp
+*.swo
+.*.swp
+
+# VSCode
+*.code-workspace
+.vscode/

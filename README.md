@@ -3,6 +3,17 @@ This is an incremental H.264 video codec based on x264 and FFmpeg that supports
 - Multi-frame RoI encoding 
 - Macroblock-level error bound control
 
+## Docker build
+```sh
+# build and run docker container
+cd docker 
+make build 
+make run 
+# build and run modified x264 on sample images in assets/
+cd myh264
+./build.sh
+```
+
 ## Build (MacOS and Linux)
 X264 and FFmpeg need to be rebuilt each time a modification is made in any of the two directories. For now, it is required that you have access to sudo on linux command line. To build, simply run
 ```
