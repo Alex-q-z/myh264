@@ -1,0 +1,29 @@
+{% set version = '0.1' %}
+package:
+  name: x264
+  version: {{ version }}
+
+build:
+  number: 1
+
+requirements:
+  build:
+    - gnuconfig  # [unix]
+    - {{ compiler("c") }}
+    - perl
+    - nasm
+    - make
+    - {{ posix }}bash  # [win]
+    - {{ posix }}coreutils  # [win]
+    - {{ posix }}grep  # [win]
+    - {{ posix }}sed  # [win]
+
+test:
+  commands:
+    - x264 --help
+
+about:
+  home: https://github.com/Alex-q-z/myh264
+  license: GPL-2.0-or-later
+  summary: Incremental x264 for macroblock level error bound control
+  dev_url: https://github.com/Alex-q-z/myh264
