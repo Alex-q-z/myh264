@@ -1,0 +1,76 @@
+{% set version = "n4.3" %}
+
+package:
+  name: ffmpeg_custom
+  version: {{ version }}
+
+source:
+  git_rev: {{ version }}
+  git_url:  https://github.com/FFmpeg/FFmpeg.git
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler("c") }}
+    - {{ compiler("cxx") }}
+    - pkg-config  # [not win]
+    - libtool  # [not win]
+    - nasm  # [not win]
+    - lame  # [not win]
+    - make  # [not win]
+  host:
+    - bzip2
+    - libpng
+    - freetype
+    - gnutls  # [not win]
+    - libiconv
+    - zlib
+    - necla-ml::x264=0.1
+    - lame  # [not win]
+    - gmp  # [unix]
+    - nettle # [not win]
+  run:
+    - bzip2
+    - libpng
+    - freetype
+    - gnutls  # [not win]
+    - libiconv
+    - zlib
+    - necla-ml::x264=0.1  # [not win]
+    - lame  # [not win]
+    - gmp  # [unix]
+    - nettle  # [not win]
+
+test:
+  commands:
+    - ffmpeg --help
+    - ffmpeg -loglevel panic -protocols | grep "https"  # [not win]
+    - ffmpeg -loglevel panic -codecs | grep "libmp3lame"  # [not win]
+    - ffmpeg -loglevel panic -codecs | grep "DEVI.S zlib"  # [unix]
+    - ffmpeg -loglevel panic -codecs | grep "DEV.LS h264"  # [unix]
+    - ffmpeg -loglevel panic -codecs | grep "x264"  # [unix]
+    # Verify dynamic libraries on all systems
+    {% set ffmpeg_libs = [
+        "avcodec",
+        "avdevice",
+        "swresample",
+        "avfilter",
+        "swresample",
+        "avcodec",
+        "avformat",
+        "swscale",
+        "avresample"
+    ] %}
+    {% for each_ffmpeg_lib in ffmpeg_libs %}
+    - test -f $PREFIX/lib/lib{{ each_ffmpeg_lib }}.dylib  # [osx]
+    - test -f $PREFIX/lib/lib{{ each_ffmpeg_lib }}.so     # [linux]
+    {% endfor %}
+    - conda inspect linkages -p $PREFIX $PKG_NAME  # [not win]
+    - conda inspect objects -p $PREFIX $PKG_NAME  # [osx]
+
+about:
+  home: http://www.ffmpeg.org/
+  license: LGPL
+  summary: Custom ffmpeg for incremental x264

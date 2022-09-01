@@ -12,7 +12,7 @@ cd ..
 git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg 
 cd ffmpeg 
 git checkout n4.3
-./configure --enable-libx264 --enable-gpl --enable-shared
+./configure --enable-libx264 --enable-gpl --enable-shared  --disable-doc 
 make -j8 && make install
 cd ..
 

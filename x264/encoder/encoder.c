@@ -2960,31 +2960,31 @@ static intptr_t slice_write( x264_t *h )
     }
 
     // Qizheng added: introduce qp matrix here
-    FILE* empirical_qp_matrix_fptr = fopen("empirical_qp_matrix_file", "w+");
-    FILE* empirical_chroma_qp_matrix_fptr = fopen("empirical_chroma_qp_matrix_file", "w+");
+    // FILE* empirical_qp_matrix_fptr = fopen("empirical_qp_matrix_file", "w+");
+    // FILE* empirical_chroma_qp_matrix_fptr = fopen("empirical_chroma_qp_matrix_file", "w+");
     // FILE* empirical_error_matrix_fptr = fopen("/Users/qizhengzhang/Desktop/x264/empirical_error_matrix_file", "w+");
     //FILE* mb_size_matrix_fptr = fopen("/Users/qizhengzhang/Desktop/x264/mb_size_matrix_file", "w+");
     // h->qp_matrix = x264_malloc(3600);
     // h->chroma_qp_matrix = x264_malloc(3600);
     //h->error_matrix = x264_malloc(3600);
     //h->mb_size_matrix = x264_malloc(3600);
-    FILE* mb_size_fptr = fopen("mb_size_matrix_file", "w+");
-    FILE* qp_delta_size_fptr = fopen("qp_delta_size_file", "a");
+    // FILE* mb_size_fptr = fopen("mb_size_matrix_file", "w+");
+    // FILE* qp_delta_size_fptr = fopen("qp_delta_size_file", "a");
 
     /* file ptrs for writing yuv to file, i.e. p_src and p_dst */
-    FILE* y_fptr = fopen("y_values_p_dst_encoder", "w+");
-    FILE* u_fptr = fopen("u_values_p_dst_encoder", "w+");
-    FILE* v_fptr = fopen("v_values_p_dst_encoder", "w+");
-    FILE* y_src_fptr = fopen("y_values_p_src_encoder", "w+");
-    FILE* u_src_fptr = fopen("u_values_p_src_encoder", "w+");
-    FILE* v_src_fptr = fopen("v_values_p_src_encoder", "w+");
+    // FILE* y_fptr = fopen("y_values_p_dst_encoder", "w+");
+    // FILE* u_fptr = fopen("u_values_p_dst_encoder", "w+");
+    // FILE* v_fptr = fopen("v_values_p_dst_encoder", "w+");
+    // FILE* y_src_fptr = fopen("y_values_p_src_encoder", "w+");
+    // FILE* u_src_fptr = fopen("u_values_p_src_encoder", "w+");
+    // FILE* v_src_fptr = fopen("v_values_p_src_encoder", "w+");
 
     /* file ptrs for writing chroma qps to file */
     // FILE* encoded_uv_qps_fptr = fopen("/Users/qizhengzhang/Desktop/x264/encoder_uv_qps", "a");
-    FILE* empirical_y_error_fptr = fopen("empirical_y_error_matrix_file", "w+");
-    FILE* empirical_u_error_fptr = fopen("empirical_u_error_matrix_file", "w+");
-    FILE* empirical_v_error_fptr = fopen("empirical_v_error_matrix_file", "w+");
-    FILE* empirical_rgb_error_fptr = fopen("rgb_error_matrix_file", "w+");
+    // FILE* empirical_y_error_fptr = fopen("empirical_y_error_matrix_file", "w+");
+    // FILE* empirical_u_error_fptr = fopen("empirical_u_error_matrix_file", "w+");
+    // FILE* empirical_v_error_fptr = fopen("empirical_v_error_matrix_file", "w+");
+    // FILE* empirical_rgb_error_fptr = fopen("rgb_error_matrix_file", "w+");
 
     int i_skip;
     int mb_xy, i_mb_x, i_mb_y;
@@ -3595,10 +3595,10 @@ reencode:
         // }
 
         /* qizheng: write empirical rgb error to files */
-        fprintf(empirical_rgb_error_fptr, "%d ", h->mb.rgb_error);
-        if (i_mb_x + 1 >= h->mb.i_mb_width) {
-            fprintf(empirical_rgb_error_fptr, "\n");
-        }
+        // fprintf(empirical_rgb_error_fptr, "%d ", h->mb.rgb_error);
+        // if (i_mb_x + 1 >= h->mb.i_mb_width) {
+        //     fprintf(empirical_rgb_error_fptr, "\n");
+        // }
 
         /* qizheng: write empirical qp delta bit size to files */
         // if (i_mb_x + 1 >= h->mb.i_mb_width) {
@@ -3644,15 +3644,15 @@ reencode:
         //     printf("\n");
         // }
 
-        fprintf(empirical_qp_matrix_fptr, "%d ", h->mb.i_qp);
-        if (i_mb_x + 1 >= h->mb.i_mb_width) {
-            fprintf(empirical_qp_matrix_fptr, "\n");
-        }
+        // fprintf(empirical_qp_matrix_fptr, "%d ", h->mb.i_qp);
+        // if (i_mb_x + 1 >= h->mb.i_mb_width) {
+        //     fprintf(empirical_qp_matrix_fptr, "\n");
+        // }
 
-        fprintf(empirical_chroma_qp_matrix_fptr, "%d ", h->mb.i_chroma_qp);
-        if (i_mb_x + 1 >= h->mb.i_mb_width) {
-            fprintf(empirical_chroma_qp_matrix_fptr, "\n");
-        }
+        // fprintf(empirical_chroma_qp_matrix_fptr, "%d ", h->mb.i_chroma_qp);
+        // if (i_mb_x + 1 >= h->mb.i_mb_width) {
+        //     fprintf(empirical_chroma_qp_matrix_fptr, "\n");
+        // }
 
         // qizheng: print out the reconstructed frame after encoding
         pixel *p_dst;
@@ -3728,53 +3728,53 @@ reencode:
 
         /* write p_src yuv to files */
         p_src = h->mb.pic.p_fenc[0];
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                fprintf(y_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
-            }
-            fprintf(y_src_fptr, "\n");
-        }
+        // for (int i = 0; i < 16; i++) {
+        //     for (int j = 0; j < 16; j++) {
+        //         fprintf(y_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
+        //     }
+        //     fprintf(y_src_fptr, "\n");
+        // }
 
         p_src = h->mb.pic.p_fenc[1];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                fprintf(u_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
-            }
-            fprintf(u_src_fptr, "\n");
-        }
+        // for (int i = 0; i < 8; i++) {
+        //     for (int j = 0; j < 8; j++) {
+        //         fprintf(u_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
+        //     }
+        //     fprintf(u_src_fptr, "\n");
+        // }
 
         p_src = h->mb.pic.p_fenc[2];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                fprintf(v_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
-            }
-            fprintf(v_src_fptr, "\n");
-        }
+        // for (int i = 0; i < 8; i++) {
+        //     for (int j = 0; j < 8; j++) {
+        //         fprintf(v_src_fptr, "%d ", p_src[j + i * FENC_STRIDE]);
+        //     }
+        //     fprintf(v_src_fptr, "\n");
+        // }
 
         /* write p_dst yuv to files */
         p_dst = h->mb.pic.p_fdec[0];
-        for (int i = 0; i < 16; i++) {
-            for (int j = 0; j < 16; j++) {
-                fprintf(y_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
-            }
-            fprintf(y_fptr, "\n");
-        }
+        // for (int i = 0; i < 16; i++) {
+        //     for (int j = 0; j < 16; j++) {
+        //         fprintf(y_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
+        //     }
+        //     fprintf(y_fptr, "\n");
+        // }
 
         p_dst = h->mb.pic.p_fdec[1];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                fprintf(u_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
-            }
-            fprintf(u_fptr, "\n");
-        }
+        // for (int i = 0; i < 8; i++) {
+        //     for (int j = 0; j < 8; j++) {
+        //         fprintf(u_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
+        //     }
+        //     fprintf(u_fptr, "\n");
+        // }
 
         p_dst = h->mb.pic.p_fdec[2];
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                fprintf(v_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
-            }
-            fprintf(v_fptr, "\n");
-        }
+        // for (int i = 0; i < 8; i++) {
+        //     for (int j = 0; j < 8; j++) {
+        //         fprintf(v_fptr, "%d ", p_dst[j + i * FDEC_STRIDE]);
+        //     }
+        //     fprintf(v_fptr, "\n");
+        // }
 
         if( h->param.b_cabac )
         {
@@ -3825,10 +3825,10 @@ reencode:
         //    x264_log(h, X264_LOG_INFO, "error is: %d (end)\n", h->mb.i_error);
         //    x264_log(h, X264_LOG_INFO, "mb_size is: %d (end)\n", mb_size);
         //}
-        fprintf(mb_size_fptr, "%d ", mb_size);
-        if (i_mb_x + 1 >= h->mb.i_mb_width) {
-            fprintf(mb_size_fptr, "\n");
-        }
+        // fprintf(mb_size_fptr, "%d ", mb_size);
+        // if (i_mb_x + 1 >= h->mb.i_mb_width) {
+        //     fprintf(mb_size_fptr, "\n");
+        // }
 
         if( slice_max_size && (!SLICE_MBAFF || (i_mb_y&1)) )
         {
@@ -4823,9 +4823,17 @@ int     x264_encoder_encode( x264_t *h,
     h->i_threadslice_end = h->mb.i_mb_height;
 
     // Qizheng: add qp matrix file here
-    h->operation_mode_file = x264_fopen("operation_mode_file", "r");
+    char qp_matrix_file[5000];
+    char operation_mode_file[5000];
+    
+    scanf("%s", operation_mode_file); 
+    x264_log( h, X264_LOG_INFO, "operation_mode_file=%s\n", operation_mode_file);
+    h->operation_mode_file = x264_fopen(operation_mode_file, "r");
     fscanf(h->operation_mode_file, "%d,", &h->operation_mode_flag);
-    h->qp_matrix_file = x264_fopen("qp_matrix_file", "r");
+
+    scanf("%s", qp_matrix_file); 
+    x264_log( h, X264_LOG_INFO, "qp_matrix_file=%s\n", qp_matrix_file );
+    h->qp_matrix_file = x264_fopen(qp_matrix_file, "r");
     // h->qp_matrix_file_test = x264_fopen("/Users/qizhengzhang/Desktop/x264/qp_matrix_file_test", "a+");
 
     if( h->i_thread_frames > 1 )
